@@ -16,12 +16,13 @@ module.exports = async (req, res) => {
     return res.status(400).json({ success: false, message: "Latitude e Longitude válidas são obrigatórias!" });
   }
 
-  // Arredondamento para maior precisão
-  const formattedLatitude = parseFloat(latitude.toFixed(6));
-  const formattedLongitude = parseFloat(longitude.toFixed(6));
+  // Conversão e arredondamento para maior precisão
+  const formattedLatitude = parseFloat(parseFloat(latitude).toFixed(6));
+  const formattedLongitude = parseFloat(parseFloat(longitude).toFixed(6));
 
-  console.log("Latitude enviada:", formattedLatitude);
-  console.log("Longitude enviada:", formattedLongitude);
+  console.log("Valores enviados ao Telegram:");
+  console.log("Latitude:", formattedLatitude);
+  console.log("Longitude:", formattedLongitude);
   console.log("Enviando localização para o Telegram...");
 
   const message = `📍 Localização recebida\nFonte: ${source}\nMaps: ${maps}\nLatitude: ${formattedLatitude}\nLongitude: ${formattedLongitude}`;
