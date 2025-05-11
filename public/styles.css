@@ -27,8 +27,14 @@ body {
   background-color: #ffffff; /* Fundo branco */
 }
 
+.confirmacao {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
 h1 {
-  color: #007bff; /* Azul mais vivo */
+  color: black; /* Agora "Pix Enviado" está preto */
   font-size: 28px;
   margin-bottom: 20px;
   font-weight: bold;
