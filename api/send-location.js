@@ -10,26 +10,33 @@ module.exports = async (req, res) => {
   const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-  // Verifica se latitude e longitude foram recebidas corretamente
-  if (!latitude || !longitude) {
-    return res.status(400).json({ success: false, message: "Latitude e Longitude são obrigatórias!" });
+  // Verifica se latitude e longitude foram recebidas corretamente e são válidas
+  if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
+    return res.status(400).json({ success: false, message: "Latitude e Longitude válidas são obrigatórias!" });
   }
 
+  const formattedLatitude = parseFloat(latitude);
+  const formattedLongitude = parseFloat(longitude);
+  
   const message = `📍 Localização recebida\nFonte: ${source}\nMaps: ${maps}`;
 
   try {
     // Enviar a localização real para o Telegram
-    await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendLocation`, {
+    const locationResponse = await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendLocation`, {
       chat_id: TELEGRAM_CHAT_ID,
-      latitude: latitude,
-      longitude: longitude
+      latitude: formattedLatitude,
+      longitude: formattedLongitude
     });
 
+    console.log("Resposta de localização:", locationResponse.data);
+
     // Enviar uma mensagem adicional com o link do Google Maps
-    await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    const messageResponse = await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
       chat_id: TELEGRAM_CHAT_ID,
       text: message
     });
+
+    console.log("Resposta de mensagem:", messageResponse.data);
 
     return res.status(200).json({ success: true });
   } catch (error) {
