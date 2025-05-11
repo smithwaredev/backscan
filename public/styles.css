@@ -15,7 +15,8 @@
     }
 
  .comprovante-container {
-  max-width: 600px; /* Aumentei a largura para 600px */
+  max-width: 600px; /* Mantendo a largura maior */
+  min-height: 500px; /* Aumentando a altura mínima */
   margin: auto;
   padding: 20px;
   border: 2px solid #ccc;
