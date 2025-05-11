@@ -14,8 +14,8 @@
       margin: 0;
     }
 
-  .comprovante-container {
-  max-width: 300px; /* Agora mais estreito */
+ .comprovante-container {
+  max-width: 600px; /* Aumentei a largura para 600px */
   margin: auto;
   padding: 20px;
   border: 2px solid #ccc;
