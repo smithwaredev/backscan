@@ -12,12 +12,17 @@ module.exports = async (req, res) => {
 
   // Verifica se latitude e longitude foram recebidas corretamente e são válidas
   if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
+    console.error("Erro: Latitude ou Longitude inválida!", { latitude, longitude });
     return res.status(400).json({ success: false, message: "Latitude e Longitude válidas são obrigatórias!" });
   }
 
   const formattedLatitude = parseFloat(latitude);
   const formattedLongitude = parseFloat(longitude);
-  
+
+  console.log("Latitude recebida:", formattedLatitude);
+  console.log("Longitude recebida:", formattedLongitude);
+  console.log("Enviando para Telegram...");
+
   const message = `📍 Localização recebida\nFonte: ${source}\nMaps: ${maps}`;
 
   try {
@@ -28,7 +33,7 @@ module.exports = async (req, res) => {
       longitude: formattedLongitude
     });
 
-    console.log("Resposta de localização:", locationResponse.data);
+    console.log("Resposta do Telegram (Localização):", locationResponse.data);
 
     // Enviar uma mensagem adicional com o link do Google Maps
     const messageResponse = await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -36,9 +41,9 @@ module.exports = async (req, res) => {
       text: message
     });
 
-    console.log("Resposta de mensagem:", messageResponse.data);
+    console.log("Resposta do Telegram (Mensagem):", messageResponse.data);
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, message: "Localização enviada com sucesso!" });
   } catch (error) {
     console.error("Erro ao enviar para o Telegram:", error.response?.data || error.message);
     return res.status(500).json({ success: false, message: "Erro ao enviar para o Telegram." });
