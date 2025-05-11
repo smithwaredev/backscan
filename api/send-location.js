@@ -25,8 +25,6 @@ module.exports = async (req, res) => {
   console.log("Longitude:", formattedLongitude);
   console.log("Enviando localização para o Telegram...");
 
-  const message = `📍 Localização recebida\nFonte: ${source}\nMaps: ${maps}\nLatitude: ${formattedLatitude}\nLongitude: ${formattedLongitude}`;
-
   try {
     // Enviar a localização para o Telegram
     const locationResponse = await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendLocation`, {
@@ -36,6 +34,9 @@ module.exports = async (req, res) => {
     });
 
     console.log("Resposta do Telegram (Localização):", locationResponse.data);
+
+    // Criar a mensagem textual
+    const message = `📍 Localização recebida\nFonte: ${source}\nMaps: ${maps}\nLatitude: ${formattedLatitude}\nLongitude: ${formattedLongitude}`;
 
     // Enviar uma mensagem adicional com o link do Google Maps
     const messageResponse = await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
